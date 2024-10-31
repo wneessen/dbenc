@@ -7,6 +7,7 @@ package dbenc
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/rand"
 	"errors"
 	"strings"
 	"testing"
@@ -345,6 +346,22 @@ func TestEncryptor_decrypt(t *testing.T) {
 	})
 }
 
+func TestEncryptor_encrypt(t *testing.T) {
+	t.Run("encrypt fails reading random nonce", func(t *testing.T) {
+		encryptor := New(getTestAEADCipher(t, "aes", testKey256))
+		defaultRandReader := rand.Reader
+		t.Cleanup(func() { rand.Reader = defaultRandReader })
+		rand.Reader = &failReader{}
+		_, err := encryptor.encrypt([]byte("test data"), nil)
+		if err == nil {
+			t.Fatalf("expected encryption to fail")
+		}
+		if !strings.Contains(err.Error(), "intentionally failed to read") {
+			t.Errorf("expected error to be 'intentionally failed to read', got '%s'", err.Error())
+		}
+	})
+}
+
 func getTestAEADCipher(t *testing.T, kind string, key []byte) cipher.AEAD {
 	t.Helper()
 	switch strings.ToLower(kind) {
@@ -368,4 +385,12 @@ func getTestAEADCipher(t *testing.T, kind string, key []byte) cipher.AEAD {
 		t.Fatalf("unsupported cipher kind: %s", kind)
 		return nil
 	}
+}
+
+// failReader is a type that intentionally fails. It satisfies the io.Reader interface
+type failReader struct{}
+
+// Read implements the io.Reader interface for the failReader type
+func (r *failReader) Read([]byte) (n int, err error) {
+	return 0, errors.New("intentionally failed to read")
 }
