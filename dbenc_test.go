@@ -382,7 +382,7 @@ func TestEncryptor_encrypt(t *testing.T) {
 }
 
 func BenchmarkEncryptor_Encrypt(b *testing.B) {
-	b.Run("AES-256-GCM (with auth data)", func(cb *testing.B) {
+	b.Run("AES-256-GCM (no auth data)", func(cb *testing.B) {
 		cb.ReportAllocs()
 		ac, err := aes.NewCipher(testKey256)
 		if err != nil {
@@ -400,7 +400,7 @@ func BenchmarkEncryptor_Encrypt(b *testing.B) {
 			}
 		}
 	})
-	b.Run("AES-128-GCM (with auth data)", func(cb *testing.B) {
+	b.Run("AES-128-GCM (no auth data)", func(cb *testing.B) {
 		cb.ReportAllocs()
 		ac, err := aes.NewCipher(testKey128)
 		if err != nil {
@@ -418,7 +418,7 @@ func BenchmarkEncryptor_Encrypt(b *testing.B) {
 			}
 		}
 	})
-	b.Run("ChaCha20-Poly1305 (with auth data)", func(cb *testing.B) {
+	b.Run("ChaCha20-Poly1305 (no auth data)", func(cb *testing.B) {
 		cb.ReportAllocs()
 		gcm, err := chacha20poly1305.New(testKey256)
 		if err != nil {
@@ -427,6 +427,56 @@ func BenchmarkEncryptor_Encrypt(b *testing.B) {
 		enc := New(gcm)
 		for i := 0; i < cb.N; i++ {
 			_, err = enc.Encrypt("test data", nil)
+			if err != nil {
+				b.Fatalf("encryption failed: %s", err)
+			}
+		}
+	})
+	b.Run("AES-256-GCM (with auth data)", func(cb *testing.B) {
+		cb.ReportAllocs()
+		ac, err := aes.NewCipher(testKey256)
+		if err != nil {
+			b.Fatalf("Failed to create AES cipher: %s", err)
+		}
+		gcm, err := cipher.NewGCM(ac)
+		if err != nil {
+			b.Fatalf("Failed to create GCM: %s", err)
+		}
+		enc := New(gcm)
+		for i := 0; i < cb.N; i++ {
+			_, err = enc.Encrypt("test data", []byte("auth data"))
+			if err != nil {
+				b.Fatalf("encryption failed: %s", err)
+			}
+		}
+	})
+	b.Run("AES-128-GCM (with auth data)", func(cb *testing.B) {
+		cb.ReportAllocs()
+		ac, err := aes.NewCipher(testKey128)
+		if err != nil {
+			b.Fatalf("Failed to create AES cipher: %s", err)
+		}
+		gcm, err := cipher.NewGCM(ac)
+		if err != nil {
+			b.Fatalf("Failed to create GCM: %s", err)
+		}
+		enc := New(gcm)
+		for i := 0; i < cb.N; i++ {
+			_, err = enc.Encrypt("test data", []byte("auth data"))
+			if err != nil {
+				b.Fatalf("encryption failed: %s", err)
+			}
+		}
+	})
+	b.Run("ChaCha20-Poly1305 (with auth data)", func(cb *testing.B) {
+		cb.ReportAllocs()
+		gcm, err := chacha20poly1305.New(testKey256)
+		if err != nil {
+			b.Fatalf("Failed to create ChaCha20-Poly1305 cipher: %s", err)
+		}
+		enc := New(gcm)
+		for i := 0; i < cb.N; i++ {
+			_, err = enc.Encrypt("test data", []byte("auth data"))
 			if err != nil {
 				b.Fatalf("encryption failed: %s", err)
 			}
@@ -435,7 +485,7 @@ func BenchmarkEncryptor_Encrypt(b *testing.B) {
 }
 
 func BenchmarkEncryptor_encrypt(b *testing.B) {
-	b.Run("AES-256-GCM (with auth data)", func(cb *testing.B) {
+	b.Run("AES-256-GCM (no auth data)", func(cb *testing.B) {
 		cb.ReportAllocs()
 		ac, err := aes.NewCipher(testKey256)
 		if err != nil {
@@ -453,7 +503,7 @@ func BenchmarkEncryptor_encrypt(b *testing.B) {
 			}
 		}
 	})
-	b.Run("AES-128-GCM (with auth data)", func(cb *testing.B) {
+	b.Run("AES-128-GCM (no auth data)", func(cb *testing.B) {
 		cb.ReportAllocs()
 		ac, err := aes.NewCipher(testKey128)
 		if err != nil {
@@ -471,7 +521,7 @@ func BenchmarkEncryptor_encrypt(b *testing.B) {
 			}
 		}
 	})
-	b.Run("ChaCha20-Poly1305 (with auth data)", func(cb *testing.B) {
+	b.Run("ChaCha20-Poly1305 (no auth data)", func(cb *testing.B) {
 		cb.ReportAllocs()
 		gcm, err := chacha20poly1305.New(testKey256)
 		if err != nil {
@@ -480,6 +530,56 @@ func BenchmarkEncryptor_encrypt(b *testing.B) {
 		enc := New(gcm)
 		for i := 0; i < cb.N; i++ {
 			_, err = enc.encrypt([]byte("test data"), nil)
+			if err != nil {
+				b.Fatalf("encryption failed: %s", err)
+			}
+		}
+	})
+	b.Run("AES-256-GCM (with auth data)", func(cb *testing.B) {
+		cb.ReportAllocs()
+		ac, err := aes.NewCipher(testKey256)
+		if err != nil {
+			b.Fatalf("Failed to create AES cipher: %s", err)
+		}
+		gcm, err := cipher.NewGCM(ac)
+		if err != nil {
+			b.Fatalf("Failed to create GCM: %s", err)
+		}
+		enc := New(gcm)
+		for i := 0; i < cb.N; i++ {
+			_, err = enc.encrypt([]byte("test data"), []byte("auth data"))
+			if err != nil {
+				b.Fatalf("encryption failed: %s", err)
+			}
+		}
+	})
+	b.Run("AES-128-GCM (with auth data)", func(cb *testing.B) {
+		cb.ReportAllocs()
+		ac, err := aes.NewCipher(testKey128)
+		if err != nil {
+			b.Fatalf("Failed to create AES cipher: %s", err)
+		}
+		gcm, err := cipher.NewGCM(ac)
+		if err != nil {
+			b.Fatalf("Failed to create GCM: %s", err)
+		}
+		enc := New(gcm)
+		for i := 0; i < cb.N; i++ {
+			_, err = enc.encrypt([]byte("test data"), []byte("auth data"))
+			if err != nil {
+				b.Fatalf("encryption failed: %s", err)
+			}
+		}
+	})
+	b.Run("ChaCha20-Poly1305 (with auth data)", func(cb *testing.B) {
+		cb.ReportAllocs()
+		gcm, err := chacha20poly1305.New(testKey256)
+		if err != nil {
+			b.Fatalf("Failed to create ChaCha20-Poly1305 cipher: %s", err)
+		}
+		enc := New(gcm)
+		for i := 0; i < cb.N; i++ {
+			_, err = enc.encrypt([]byte("test data"), []byte("auth data"))
 			if err != nil {
 				b.Fatalf("encryption failed: %s", err)
 			}
