@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 Winni Neessen <wn@neessen.dev>
+//
+// SPDX-License-Identifier: MIT
+
 // Package dbenc provides a secure and efficient way to encrypt and decrypt Go data
 // structures for storage in databases. It leverages Go’s gob encoding format to
 // serialize complex data structures before encryption, making it especially suitable
