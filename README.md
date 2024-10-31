@@ -1,0 +1,56 @@
+# dbenc
+
+`dbenc` provides a secure and efficient way to encrypt and decrypt Go data structures for storage in databases. Leveraging Go’s `gob` encoding format, it serializes complex data structures before encryption, making it well-suited for handling structs, slices, maps, and other structured data.
+
+## Features
+
+- **Secure encryption** using an authenticated encryption with additional data (AEAD) cipher like `AES-GCM` or `ChaCha20-Poly1305`.
+- **Data integrity verification** to ensure encrypted data is not tampered with.
+- **Support for complex Go data structures** (e.g., structs, slices, maps) through `gob` encoding.
+
+## Installation
+
+```bash
+$ go get github.com/wneessen/dbenc
+```
+
+## Example
+```go
+package main
+
+import (
+    "crypto/aes"
+    "crypto/cipher"
+    "log"
+
+    "github.com/wneessen/dbenc"
+)
+
+func main() {
+    key := []byte("your-32-byte-key-here-12345678901234")
+    block, err := aes.NewCipher(key)
+    if err != nil {
+        log.Fatalf("Failed to create cipher: %v", err)
+    }
+    aead, err := cipher.NewGCM(block)
+    if err != nil {
+        log.Fatalf("Failed to create AEAD: %v", err)
+    }
+    
+    encryptor := dbenc.New(aead)
+    myData := struct{ Name string }{"example"}
+
+    encryptedData, err := encryptor.Encrypt(myData, []byte("authData"))
+    if err != nil {
+        log.Fatalf("Encryption failed: %v", err)
+    }
+
+    var decryptedData struct{ Name string }
+    err = encryptor.Decrypt(&decryptedData, encryptedData, []byte("authData"))
+    if err != nil {
+        log.Fatalf("Decryption failed: %v", err)
+    }
+    
+    log.Printf("Decrypted data: %+v", decryptedData)
+}
+```
