@@ -26,7 +26,18 @@ SPDX-License-Identifier: MIT
 $ go get github.com/wneessen/dbenc
 ```
 
-## Example
+## Threat Model and AAD Usage
+
+`dbenc` is designed to protect sensitive data in databases from tampering and unauthorized reuse. Specifically, it
+addresses threats where an attacker might attempt to swap encrypted values between rows or tables, or reuse encrypted
+data in unintended contexts.
+
+To prevent these attacks, `dbenc` encourages the use of **Additional Authenticated Data (AAD)**, binding encrypted data
+to its specific context (e.g., table name, row ID, column name). This ensures that encrypted values are valid only in
+their original context and cannot be swapped or reused by an adversary without detection.
+
+### Example (with contextual AAD)
+
 ```go
 package main
 
@@ -34,7 +45,7 @@ import (
     "crypto/aes"
     "crypto/cipher"
     "log"
-
+    
     "github.com/wneessen/dbenc"
 )
 
@@ -48,17 +59,25 @@ func main() {
     if err != nil {
         log.Fatalf("Failed to create AEAD: %v", err)
     }
-    
+
     encryptor := dbenc.New(aead)
     myData := struct{ Name string }{"example"}
 
-    encryptedData, err := encryptor.Encrypt(myData, []byte("authData"))
+    // Define AAD with contextual information
+    tableName := "users"
+    rowID := "12345"
+    columnName := "name"
+    authData := []byte(tableName + ":" + rowID + ":" + columnName)
+
+    // Encrypt with contextual AAD
+    encryptedData, err := encryptor.Encrypt(myData, authData)
     if err != nil {
         log.Fatalf("Encryption failed: %v", err)
     }
 
+    // Decrypt with the same contextual AAD
     var decryptedData struct{ Name string }
-    err = encryptor.Decrypt(&decryptedData, encryptedData, []byte("authData"))
+    err = encryptor.Decrypt(&decryptedData, encryptedData, authData)
     if err != nil {
         log.Fatalf("Decryption failed: %v", err)
     }
@@ -66,3 +85,7 @@ func main() {
     log.Printf("Decrypted data: %+v", decryptedData)
 }
 ```
+
+## License
+
+This package is licensed under the MIT License. See [LICENSE](LICENSE) for details.
