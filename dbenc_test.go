@@ -5,6 +5,7 @@
 package dbenc
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
@@ -360,6 +361,24 @@ func TestEncryptor_encrypt(t *testing.T) {
 			t.Errorf("expected error to be 'intentionally failed to read', got '%s'", err.Error())
 		}
 	})
+	t.Run("encrypt succeeds predictable with zero randomness", func(t *testing.T) {
+		encryptor := New(getTestAEADCipher(t, "aes", testKey256))
+		defaultRandReader := rand.Reader
+		t.Cleanup(func() { rand.Reader = defaultRandReader })
+		rand.Reader = &zeroRandomReader{}
+		ciphertext, err := encryptor.encrypt([]byte("test data"), nil)
+		if err != nil {
+			t.Fatalf("encryption failed: %s", err)
+		}
+		want := []byte{
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x47, 0x7b, 0xa6,
+			0xd9, 0x08, 0x97, 0xc2, 0xd3, 0x10, 0x95, 0x2e, 0x49, 0x6d, 0xf1, 0xb9, 0xf1, 0x9d, 0xcf,
+			0x6d, 0x1c, 0xa2, 0x73, 0xaf, 0xe4, 0x24,
+		}
+		if !bytes.Equal(ciphertext, want) {
+			t.Errorf("ciphertext mismatch: got %x, want %x", ciphertext, want)
+		}
+	})
 }
 
 func getTestAEADCipher(t *testing.T, kind string, key []byte) cipher.AEAD {
@@ -393,4 +412,12 @@ type failReader struct{}
 // Read implements the io.Reader interface for the failReader type
 func (r *failReader) Read([]byte) (n int, err error) {
 	return 0, errors.New("intentionally failed to read")
+}
+
+// zeroRandomReader is a type that returns no randomness. It satisfies the io.Reader interface
+type zeroRandomReader struct{}
+
+// Read implements the io.Reader interface for the zeroRandomReader type
+func (r *zeroRandomReader) Read(p []byte) (n int, err error) {
+	return len(p), nil
 }
