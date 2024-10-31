@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2024 Winni Neessen <wn@neessen.dev>
+
+SPDX-License-Identifier: MIT
+-->
+
 # dbenc
 
 `dbenc` provides a secure and efficient way to encrypt and decrypt Go data structures for storage in databases. Leveraging Go’s `gob` encoding format, it serializes complex data structures before encryption, making it well-suited for handling structs, slices, maps, and other structured data.
