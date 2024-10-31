@@ -6,6 +6,12 @@ SPDX-License-Identifier: MIT
 
 # dbenc
 
+[![GoDoc](https://godoc.org/github.com/wneessen/dbenc?status.svg)](https://pkg.go.dev/github.com/wneessen/dbenc)
+[![codecov](https://codecov.io/gh/wneessen/dbenc/branch/main/graph/badge.svg?token=37KWJV03MR)](https://codecov.io/gh/wneessen/dbenc)
+[![Go Report Card](https://goreportcard.com/badge/github.com/wneessen/dbenc)](https://goreportcard.com/report/github.com/wneessen/dbenc)
+[![REUSE status](https://api.reuse.software/badge/github.com/wneessen/dbenc)](https://api.reuse.software/info/github.com/wneessen/dbenc)
+<a href="https://ko-fi.com/D1D24V9IX"><img src="https://uploads-ssl.webflow.com/5c14e387dab576fe667689cf/5cbed8a4ae2b88347c06c923_BuyMeACoffee_blue.png" height="20" alt="buy ma a coffee"></a>
+
 `dbenc` provides a secure and efficient way to encrypt and decrypt Go data structures for storage in databases. Leveraging Go’s `gob` encoding format, it serializes complex data structures before encryption, making it well-suited for handling structs, slices, maps, and other structured data.
 
 ## Features
