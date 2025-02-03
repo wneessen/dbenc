@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Package scs implements the Codec interface of Alex Edward's SCS Session Management
+// Package scs_codec implements the Codec interface of Alex Edward's SCS Session Management
 // package so that dbenc can be used for encrypting session data before storing them
 // in memory or in any other corrsponding session storage that is supported by SCS.
 //
 // Due to the nature of the interface, dbenc will not authenticate the encrypted data
 // since it has no value that could be used for the corresponding authentication.
 
-package scs
+package scs_codec
 
 import (
 	"bytes"
