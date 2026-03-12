@@ -4,8 +4,8 @@
 
 module github.com/wneessen/dbenc
 
-go 1.24.0
+go 1.25.0
 
-require golang.org/x/crypto v0.48.0
+require golang.org/x/crypto v0.49.0
 
-require golang.org/x/sys v0.41.0 // indirect
+require golang.org/x/sys v0.42.0 // indirect
