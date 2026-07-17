@@ -6,4 +6,15 @@ version = 1
 SPDX-PackageName = "dbenc"
 SPDX-PackageSupplier = "Winni Neessen <winni@neessen.dev>"
 SPDX-PackageDownloadLocation = "https://github.com/wneessen/dbenc"
-annotations = []
+
+[[annotations]]
+path = ["flake.nix"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Winni Neessen <winni@neessen.dev>"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["flake.lock"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Winni Neessen <winni@neessen.dev>"
+SPDX-License-Identifier = "MIT"
